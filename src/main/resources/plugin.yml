@@ -37,6 +37,11 @@ commands:
       usage: /show
       permission: hideandseek.show
       permission-message: You don't have permission to show the game.
+  random:
+      description: set the seekers and hiders randomly
+      usage: /random
+      permission: hideandseek.random
+      permission-message: You don't have permission to set the seekers and hiders randomly.
   
 
 permissions:
@@ -60,4 +65,7 @@ permissions:
     default: op
   hideandseek.show:
     description: show the game
+    default: op
+  hideandseek.random:
+    description: set the seekers and hiders randomly
     default: op

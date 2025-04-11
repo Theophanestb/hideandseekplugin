@@ -1,11 +1,12 @@
 package com.petitpastis.commands;
 
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
+import org.bukkit.Material;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import com.petitpastis.Plugin;
 import com.petitpastis.enums.States;
@@ -31,12 +32,52 @@ public class CommandsHandler implements CommandExecutor {
                 sender.sendMessage("§cVeuillez définir les spawns avant de lancer la partie !");
                 return true;
             }
+            int nbPlayers = plugin.getPlayers().size();
+            if (nbPlayers < 2)
+            {
+                sender.sendMessage("§cPas assez de joueurs pour randomiser les équipes !");
+                return true;
+            }
+            
+            if (plugin.getState() != States.WAITING)
+            {
+                sender.sendMessage("§cLa partie a déjà commencé !");
+                return true;
+            }
+
+            if (plugin.getSeekers().isEmpty() && plugin.isRandomize() == false)
+            {
+                Bukkit.broadcastMessage("§cAucun seeker défini !");
+                return true;
+            }
+            
+            for (Player player : plugin.getPlayers())
+            {
+                player.getInventory().clear();
+            }
+            //lancement random
+            if (plugin.isRandomize())
+            {
+                int random = (int) (Math.random() * nbPlayers);
+                Player player = plugin.getPlayers().get(random);
+                plugin.addSeeker(player);
+                for (int i = 0; i < plugin.getPlayers().size(); i++) {
+                    if (i != random) 
+                    {
+                        plugin.addHider(plugin.getPlayers().get(i));
+                    }
+                }
+                
+                plugin.startGame();
+                return true;
+            }
+            //lancement seeker prédéfini
             boolean isFull = true;
             for (Player player : plugin.getPlayers())
             {
                 if (!plugin.getSeekers().contains(player) && !plugin.getHiders().contains(player))
                 {
-                    Bukkit.broadcastMessage(ChatColor.AQUA +player.getName() + "§c n'est dans aucune équipe !");
+                    Bukkit.broadcastMessage(ChatColor.GOLD +player.getName() + "§c n'est dans aucune équipe !");
                     isFull = false;
                 }   
             }
@@ -83,9 +124,9 @@ public class CommandsHandler implements CommandExecutor {
         }
         if (command.getName().equalsIgnoreCase("spawn"))
         {
-            plugin.setSeekerSpawn(((Player)sender).getLocation());
+            plugin.spawn = ((Player)sender).getLocation();
             sender.sendMessage("§aSpawn par défaut défini !");
-            return true;  
+            return true; 
         }
         if (command.getName().equalsIgnoreCase("show"))
         {
@@ -115,6 +156,49 @@ public class CommandsHandler implements CommandExecutor {
                 else
                 {
                     Bukkit.broadcastMessage(player.getName() + " n'est dans aucune équipe !");
+                }
+            }
+            return true;
+        }
+        if (command.getName().equalsIgnoreCase("random"))
+        {
+            if (plugin.getState() == States.PLAYING)
+            {
+                sender.sendMessage("§cImpossible de randomiser les équipes pendant la partie !");
+                return true;
+            }
+            if (!plugin.isRandomize())
+            {
+                plugin.setRandomize(true);
+                Bukkit.broadcastMessage("§aRandomisation des équipes activée !");
+            }
+            else
+            {
+                plugin.setRandomize(false);
+                Bukkit.broadcastMessage("§cRandomisation des équipes désactivée !");
+                for (Player player : plugin.getPlayers())
+                {
+                    ItemStack compass = new ItemStack(Material.COMPASS);
+                    player.getInventory().addItem(compass);
+                }
+                return true;
+            }
+            for (Player player : plugin.getPlayers())
+            {
+                player.getInventory().clear();
+                player.setDisplayName(ChatColor.WHITE + player.getName());
+                player.setPlayerListName(ChatColor.WHITE + player.getName());  
+                if (plugin.invisibleNameTeam.hasEntry(player.getName())) 
+                {
+                    plugin.invisibleNameTeam.removeEntry(player.getName());
+                }
+                if (plugin.getHiders().contains(player))
+                {
+                    plugin.getHiders().remove(player);
+                }
+                if (plugin.getSeekers().contains(player))
+                {
+                    plugin.getSeekers().remove(player);
                 }
             }
             return true;

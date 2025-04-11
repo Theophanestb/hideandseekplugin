@@ -1,13 +1,11 @@
 package com.petitpastis;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.petitpastis.enums.States;
-
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class GameLauncher extends BukkitRunnable {
 
@@ -33,7 +31,7 @@ public class GameLauncher extends BukkitRunnable {
 
         if (timer == 5 || timer == 4 || timer == 3 || timer == 2 || timer == 1)
         {
-            Bukkit.broadcastMessage("§cça lance dans §e" + timer + "s");
+            Bukkit.broadcastMessage("§7§oça lance dans " + timer + "s");
         }
 
         if (timer == 0)
@@ -51,14 +49,14 @@ public class GameLauncher extends BukkitRunnable {
         {
             player.getInventory().clear();
             player.setInvulnerable(false);
-            player.teleport(new Location(Bukkit.getServer().getWorld("world"), -55, -60, -60));
+            player.teleport(plugin.getSeekerSpawn());
 
         }
         for (Player player : plugin.getHiders())
         {
             player.getInventory().clear();
             player.setInvulnerable(false);
-            player.teleport(new Location(Bukkit.getServer().getWorld("world"), -60, -60, -65));
+            player.teleport(plugin.getHiderSpawn());
         }
     }
 }

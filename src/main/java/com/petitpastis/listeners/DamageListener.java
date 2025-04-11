@@ -1,6 +1,7 @@
 package com.petitpastis.listeners;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Effect;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -8,6 +9,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import com.petitpastis.Plugin;
 import com.petitpastis.enums.States;
+
+import net.md_5.bungee.api.ChatColor;
 
 public class DamageListener  implements org.bukkit.event.Listener{
     
@@ -38,7 +41,8 @@ public class DamageListener  implements org.bukkit.event.Listener{
                 {
                     MoveToSeeker(victim);
                     victim.getWorld().playSound(victim.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1);
-                    Bukkit.broadcastMessage(victim.getName() + " s'est fait avoir par " + damager.getName());
+                    victim.getWorld().playEffect(victim.getLocation(), Effect.FIREWORK_SHOOT, 0);
+                    Bukkit.broadcastMessage(ChatColor.AQUA +victim.getName() +ChatColor.DARK_RED+ " s'est fait avoir par " +ChatColor.LIGHT_PURPLE+ damager.getName());
                     damager.setExp(damager.getLevel() + 1);
                     plugin.isGameOver();
                 }

@@ -7,23 +7,23 @@ import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
-import org.bukkit.Location;
-import org.bukkit.Material;
 
 import com.petitpastis.commands.CommandsHandler;
 import com.petitpastis.enums.States;
 import com.petitpastis.listeners.BlockListener;
+import com.petitpastis.listeners.DamageListener;
 import com.petitpastis.listeners.DeathListener;
 import com.petitpastis.listeners.HungerListener;
-import com.petitpastis.listeners.TeamSelectorListener;
-import com.petitpastis.listeners.DamageListener;
 import com.petitpastis.listeners.PlayerListener;
+import com.petitpastis.listeners.TeamSelectorListener;
 
 /*
  * hideandseek java plugin
@@ -38,52 +38,29 @@ public class Plugin extends JavaPlugin
 
   private Scoreboard scoreboard;
 
-  public Team hiderTeam;
-  public Team seekerTeam;
+  private boolean randomize = false;
+
+  public Team invisibleNameTeam;
 
   private States state;
   private GameLauncher gameLauncher;
 
-  private Location seekerSpawn;// = new Location(Bukkit.getServer().getWorld("world"), -60, -60, -65);
-  private Location hiderSpawn;// = new Location(Bukkit.getServer().getWorld("world"), -55, -60, -60);
-  private Location spawn;// = new Location(Bukkit.getServer().getWorld("world"), -60, -60, -60);
+  private Location seekerSpawn;
+  private Location hiderSpawn;
+  public Location spawn;
 
   @Override
   public void onEnable()
   {
     LOGGER.info("hideandseek enabled");
 
-    // Initialize scoreboard and teams
-    this.scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-    if (scoreboard == null) {
-        LOGGER.warning("Scoreboard manager is not available. Please check the server configuration.");
-        return;
-    }
+    scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
 
-    // Register teams if not already registered
-    hiderTeam = scoreboard.getTeam("hiders");
-    if (hiderTeam == null) {
-    hiderTeam = scoreboard.registerNewTeam("hiders");
-    hiderTeam.setPrefix(ChatColor.GREEN.toString());
-    hiderTeam.setDisplayName("Hiders");
-    hiderTeam.setColor(ChatColor.GREEN);
+    invisibleNameTeam = scoreboard.getTeam("invisibleNameTeam");
+    if (invisibleNameTeam == null) {
+        invisibleNameTeam = scoreboard.registerNewTeam("invisibleNameTeam");
     }
-
-    seekerTeam = scoreboard.getTeam("seekers");
-    if (seekerTeam == null) {
-    seekerTeam = scoreboard.registerNewTeam("seekers");
-    seekerTeam.setPrefix(ChatColor.RED.toString());
-    seekerTeam.setDisplayName("Seekers");
-    seekerTeam.setColor(ChatColor.RED);
-    }
-
-    noteam = scoreboard.getTeam("seekers");
-    if (noteam == null) {
-    seekerTeam = scoreboard.registerNewTeam("seekers");
-    seekerTeam.setPrefix(ChatColor.RED.toString());
-    seekerTeam.setDisplayName("Seekers");
-    seekerTeam.setColor(ChatColor.RED);
-    }
+    invisibleNameTeam.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
 
     PluginManager pm = getServer().getPluginManager();
     pm.registerEvents(new TeamSelectorListener(this), this);
@@ -100,6 +77,7 @@ public class Plugin extends JavaPlugin
     getCommand("hiderspawn").setExecutor(new CommandsHandler(this));
     getCommand("spawn").setExecutor(new CommandsHandler(this));
     getCommand("show").setExecutor(new CommandsHandler(this));
+    getCommand("random").setExecutor(new CommandsHandler(this));
 
     resetGame();
   }
@@ -108,6 +86,16 @@ public class Plugin extends JavaPlugin
   public void onDisable()
   {
     LOGGER.info("hideandseek disabled");
+  }
+
+  public void setRandomize(boolean randomize)
+  {
+    this.randomize = randomize;
+  }
+
+  public boolean isRandomize()
+  {
+    return randomize;
   }
 
   public void setState(States state)
@@ -182,7 +170,7 @@ public class Plugin extends JavaPlugin
   public void addPlayers(Player player)
   {
     players.add(player);
-    Bukkit.broadcastMessage(getName() + " : " + player.getName() + " a rejoint le jeu !");
+    //Bukkit.broadcastMessage(getName() + " : " + player.getName() + " a rejoint le jeu !");
   }
 
   public void removePlayers(Player player)
@@ -204,12 +192,8 @@ public class Plugin extends JavaPlugin
     {
       hiders.remove(player);
     }
-    seekerTeam.addEntry(player.getName());
-    //player.setDisplayName(ChatColor.RED + player.getName());
-    player.setPlayerListName(ChatColor.RED + player.getName());
-    
-    /*player.setCustomName(ChatColor.RED + player.getName());
-    player.setCustomNameVisible(true);*/
+    player.setPlayerListName(ChatColor.LIGHT_PURPLE +"[SEEKER] " + player.getName());
+    invisibleNameTeam.addEntry(player.getName());
     seekers.add(player);
   }
 
@@ -219,12 +203,8 @@ public class Plugin extends JavaPlugin
     {
       seekers.remove(player);
     }
-    hiderTeam.addEntry(player.getName());
-    player.setPlayerListName(ChatColor.GREEN + player.getName());
-    //player.setDisplayName(ChatColor.GREEN + player.getName());
-    
-    /*player.setCustomName(ChatColor.GREEN + player.getName());
-    player.setCustomNameVisible(true);*/
+    player.setPlayerListName(ChatColor.AQUA + player.getName());
+    invisibleNameTeam.addEntry(player.getName());
     hiders.add(player);
   } 
 
@@ -250,29 +230,31 @@ public class Plugin extends JavaPlugin
     setState(States.WAITING);
     for (Player player : players)
     {
-      player.teleport(new Location(Bukkit.getServer().getWorld("world"), -60, -60, -60));
+      if (spawn == null)
+      {
+        spawn = Bukkit.getServer().getWorld("world").getSpawnLocation();
+        if (spawn == null)
+        {
+            spawn = new org.bukkit.Location(Bukkit.getServer().getWorld("world"), -60, -60, -60);
+        }
+      }
+      player.teleport(spawn);
       player.setGameMode(GameMode.SURVIVAL);
       player.setInvulnerable(true);
       player.getInventory().clear();
-
-      ItemStack compass = new ItemStack(Material.COMPASS);
-      player.getInventory().addItem(compass);
-
+      if (!isRandomize())
+      {
+        ItemStack compass = new ItemStack(Material.COMPASS);
+        player.getInventory().addItem(compass);
+      }
       player.setExp(0);
 
-      if (seekerTeam.hasEntry(player.getName())) 
-      {
-        seekerTeam.removeEntry(player.getName());
-      }
-      if (hiderTeam.hasEntry(player.getName()))
-      {
-          hiderTeam.removeEntry(player.getName());
-      }
       player.setDisplayName(ChatColor.WHITE + player.getName());
-      player.setPlayerListName(ChatColor.WHITE + player.getName());
-      player.setCustomName(ChatColor.WHITE + player.getName());
-      player.setCustomNameVisible(false);
-      
+      player.setPlayerListName(ChatColor.WHITE + player.getName());  
+      if (invisibleNameTeam.hasEntry(player.getName())) 
+      {
+        invisibleNameTeam.removeEntry(player.getName());
+      }    
     }
     gameLauncher = null;
   }
@@ -283,7 +265,7 @@ public class Plugin extends JavaPlugin
     {
       if (hiders.isEmpty())
       {
-        Bukkit.broadcastMessage(ChatColor.RED + "Les seekers ont gagné !");
+        Bukkit.broadcastMessage(ChatColor.LIGHT_PURPLE + "Victoire des Seekers !");
         resetGame();
       }
     }

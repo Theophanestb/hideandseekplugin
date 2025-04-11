@@ -36,15 +36,15 @@ public class TeamSelectorListener implements Listener {
         Inventory inventory = plugin.getServer().createInventory(null, 9, ChatColor.GOLD + "Choisis ton équipe");
 
         // Crée l'élément laine verte pour les hiders
-        ItemStack greenWool = new ItemStack(Material.GREEN_WOOL);
+        ItemStack greenWool = new ItemStack(Material.PLAYER_HEAD);
         ItemMeta greenMeta = greenWool.getItemMeta();
-        greenMeta.setDisplayName(ChatColor.GREEN + "Rejoindre les Hiders");
+        greenMeta.setDisplayName(ChatColor.AQUA + "Rejoindre les Hiders");
         greenWool.setItemMeta(greenMeta);
 
         // Crée l'élément laine rouge pour les seekers
-        ItemStack redWool = new ItemStack(Material.RED_WOOL);
+        ItemStack redWool = new ItemStack(Material.PIGLIN_HEAD);
         ItemMeta redMeta = redWool.getItemMeta();
-        redMeta.setDisplayName(ChatColor.RED + "Rejoindre les Seekers");
+        redMeta.setDisplayName(ChatColor.LIGHT_PURPLE + "Rejoindre les Seekers");
         redWool.setItemMeta(redMeta);
 
         // Ajoute les éléments dans le menu
@@ -68,15 +68,21 @@ public class TeamSelectorListener implements Listener {
         if (clicked == null || clicked.getType() == Material.AIR) return;
 
         // Si le joueur clique sur la laine verte, il rejoint l'équipe des Hiders
-        if (clicked.getType() == Material.GREEN_WOOL) 
+        if (clicked.getType() == Material.PLAYER_HEAD) 
         {
-            Bukkit.broadcastMessage(ChatColor.GREEN + player.getName() + " a rejoint les Hiders !");
+            Bukkit.broadcastMessage(ChatColor.AQUA + player.getName() + " a rejoint les Hiders !");
             plugin.addHider(player);
         }
         // Si le joueur clique sur la laine rouge, il rejoint l'équipe des Seekers
-        else if (clicked.getType() == Material.RED_WOOL) 
+        else if (clicked.getType() == Material.PIGLIN_HEAD) 
         {
-            Bukkit.broadcastMessage(ChatColor.RED + player.getName() + " a rejoint les Seekers !");
+            if (plugin.getSeekers().size() == 1) 
+            {
+                player.sendMessage(ChatColor.RED + "Seul un joueur peut être Seeker");
+                player.closeInventory();
+                return;
+            }
+            Bukkit.broadcastMessage(ChatColor.LIGHT_PURPLE + player.getName() + " devient Seeker !");
             plugin.addSeeker(player);
         }
 
