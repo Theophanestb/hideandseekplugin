@@ -3,8 +3,8 @@ package com.petitpastis.listeners;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.PlayerDeathEvent;
 
 import com.petitpastis.Plugin;
 
@@ -20,9 +20,6 @@ public class DeathListener implements org.bukkit.event.Listener {
         Player victim = event.getEntity();
         Player killer = event.getEntity().getKiller();
 
-        victim.spigot().respawn();
-        victim.teleport(plugin.getSeekerSpawn());
-
         if (plugin.isHider(victim))
         {
             if (victim.getLastDamageCause().getCause() == DamageCause.FALL)
@@ -35,10 +32,15 @@ public class DeathListener implements org.bukkit.event.Listener {
         {
             killer.setExp(killer.getLevel() + 1);
         }
-        if (plugin.isHider(killer) && plugin.isSeeker(victim)) 
+        if (plugin.isHider(killer) && plugin.isSeeker(victim))
         {
             Bukkit.broadcastMessage(victim.getName() + " s'est fait bousiller par " + killer.getName() + " bahaha dans l'crâne à ta mère");
         }
+        
+        victim.spigot().respawn();
+        victim.setHealth(20);
+        victim.setGameMode(org.bukkit.GameMode.SURVIVAL);
+        victim.teleport(plugin.getSeekerSpawn());
         plugin.isGameOver();
     
     }

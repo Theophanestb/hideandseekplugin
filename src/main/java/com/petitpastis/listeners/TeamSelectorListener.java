@@ -25,9 +25,10 @@ public class TeamSelectorListener implements Listener {
     @EventHandler
     public void onCompassClick(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        if (player.getInventory().getItemInMainHand().getType() == Material.COMPASS) {
-            openTeamSelectorMenu(player);
+        if (player.getInventory().getItemInMainHand().getType() == Material.CLOCK) {
             event.setCancelled(true);
+            openTeamSelectorMenu(player);
+            
         }
     }
 

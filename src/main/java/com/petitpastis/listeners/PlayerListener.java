@@ -3,7 +3,9 @@ package com.petitpastis.listeners;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.GameRule;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -27,6 +29,10 @@ public class PlayerListener implements Listener
     public void onJoin(PlayerJoinEvent event) 
     {
         Player player = event.getPlayer();
+
+        World world = player.getWorld();
+        world.setGameRule(GameRule.KEEP_INVENTORY, true);
+        
         if (plugin.spawn == null)
         {
             plugin.spawn = Bukkit.getServer().getWorld("world").getSpawnLocation();
@@ -34,6 +40,7 @@ public class PlayerListener implements Listener
             {
                 plugin.spawn = new org.bukkit.Location(Bukkit.getServer().getWorld("world"), -60, -60, -60);
             }
+            player.teleport(plugin.spawn);
         }
         plugin.addPlayers(player);
         player.getInventory().clear();
@@ -53,8 +60,8 @@ public class PlayerListener implements Listener
         player.setDisplayName(ChatColor.WHITE + player.getName());
         player.setPlayerListName(ChatColor.WHITE + player.getName());
 
-        ItemStack compass = new ItemStack(Material.COMPASS);
-        player.getInventory().addItem(compass);
+        ItemStack compass = new ItemStack(Material.CLOCK);
+        player.getInventory().setItem(4,compass);
 
         player.sendMessage(ChatColor.YELLOW + "Clique sur la boussole pour choisir ton camp !");
     }

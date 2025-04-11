@@ -42,6 +42,11 @@ commands:
       usage: /random
       permission: hideandseek.random
       permission-message: You don't have permission to set the seekers and hiders randomly.
+  resume:
+      description: resume the game
+      usage: /resume
+      permission: hideandseek.resume
+      permission-message: You don't have permission to resume the game.
   
 
 permissions:
@@ -68,4 +73,7 @@ permissions:
     default: op
   hideandseek.random:
     description: set the seekers and hiders randomly
+    default: op
+  hideandseek.resume:
+    description: resume the game
     default: op

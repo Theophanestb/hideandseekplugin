@@ -1,11 +1,15 @@
 package com.petitpastis.listeners;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Effect;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
 import org.bukkit.Sound;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.inventory.meta.FireworkMeta;
 
 import com.petitpastis.Plugin;
 import com.petitpastis.enums.States;
@@ -41,9 +45,12 @@ public class DamageListener  implements org.bukkit.event.Listener{
                 {
                     MoveToSeeker(victim);
                     victim.getWorld().playSound(victim.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1);
-                    victim.getWorld().playEffect(victim.getLocation(), Effect.FIREWORK_SHOOT, 0);
                     Bukkit.broadcastMessage(ChatColor.AQUA +victim.getName() +ChatColor.DARK_RED+ " s'est fait avoir par " +ChatColor.LIGHT_PURPLE+ damager.getName());
                     damager.setExp(damager.getLevel() + 1);
+                    if (plugin.getSeekers().size() == 1)
+                    {
+                        launchFirework(victim);
+                    }
                     plugin.isGameOver();
                 }
                 victim.damage(0);
@@ -56,4 +63,20 @@ public class DamageListener  implements org.bukkit.event.Listener{
     {
         plugin.addSeeker(player);
     }
+
+    public void launchFirework(Player victim) 
+  {
+      Firework firework = (Firework) victim.getWorld().spawnEntity(victim.getLocation(), EntityType.FIREWORK_ROCKET);
+      FireworkMeta meta = firework.getFireworkMeta();
+
+      FireworkEffect effect = FireworkEffect.builder()
+              .withColor(Color.RED)
+              .withFade(Color.BLUE)
+              .with(FireworkEffect.Type.BURST)
+              .build();
+      
+      meta.addEffect(effect);
+      meta.setPower(1);  // L'intensité du feu d'artifice (1 à 3)
+      firework.setFireworkMeta(meta);
+  }
 }

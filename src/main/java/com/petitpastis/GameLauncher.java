@@ -1,8 +1,11 @@
 package com.petitpastis;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.petitpastis.enums.States;
@@ -48,9 +51,20 @@ public class GameLauncher extends BukkitRunnable {
         for (Player player : plugin.getSeekers())
         {
             player.getInventory().clear();
-            player.setInvulnerable(false);
             player.teleport(plugin.getSeekerSpawn());
-
+            player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 600, 9, false, false));
+            plugin.seekerWaiting = true;
+            player.setInvulnerable(true);
+            plugin.givePiglinHeadToPlayer(player);
+            Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
+                @Override
+                public void run() {
+                    plugin.seekerWaiting = false;
+                    player.setInvulnerable(false);
+                    Bukkit.broadcastMessage(ChatColor.GREEN + "Le seeker est maintenant libre !");
+                }
+            }, 600L);
+            
         }
         for (Player player : plugin.getHiders())
         {
@@ -59,4 +73,5 @@ public class GameLauncher extends BukkitRunnable {
             player.teleport(plugin.getHiderSpawn());
         }
     }
+
 }

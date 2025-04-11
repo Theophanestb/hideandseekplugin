@@ -35,7 +35,7 @@ public class CommandsHandler implements CommandExecutor {
             int nbPlayers = plugin.getPlayers().size();
             if (nbPlayers < 2)
             {
-                sender.sendMessage("§cPas assez de joueurs pour randomiser les équipes !");
+                sender.sendMessage("§cPas assez de joueurs jouer ! (pas d'amis?)");
                 return true;
             }
             
@@ -96,11 +96,29 @@ public class CommandsHandler implements CommandExecutor {
         {
             if (plugin.getState() == States.PLAYING)
             {
-                //plugin.pauseGame(); // to implement
+                Bukkit.broadcastMessage("§aPouce");
+                for (Player player : plugin.getPlayers())
+                {
+                    player.setInvulnerable(true);
+                }
+                plugin.isGamePaused = true;
                 return true;
             }
             return true;
         }
+        if (command.getName().equalsIgnoreCase("resume"))
+        {
+            if (plugin.isGamePaused == true)
+            {
+                Bukkit.broadcastMessage("§aLa partie reprend !");
+            }
+            for (Player player : plugin.getPlayers())
+            {
+                player.setInvulnerable(false);
+            }
+            plugin.isGamePaused = false;
+            return true;
+    }
         if (command.getName().equalsIgnoreCase("end"))
         {
             if (plugin.getState() == States.PLAYING)
@@ -178,8 +196,8 @@ public class CommandsHandler implements CommandExecutor {
                 Bukkit.broadcastMessage("§cRandomisation des équipes désactivée !");
                 for (Player player : plugin.getPlayers())
                 {
-                    ItemStack compass = new ItemStack(Material.COMPASS);
-                    player.getInventory().addItem(compass);
+                    ItemStack compass = new ItemStack(Material.CLOCK);
+                    player.getInventory().setItem(4,compass);
                 }
                 return true;
             }
