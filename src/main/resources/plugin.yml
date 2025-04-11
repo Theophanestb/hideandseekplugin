@@ -1,0 +1,63 @@
+name: hideandseek
+main: com.petitpastis.Plugin
+version: 0.1
+api-version: 1.21
+commands:
+  start:
+      description: start the game
+      permission: hideandseek.start
+      permission-message: You don't have permission to start the game.
+  end:
+      description: stop the game
+      usage: /end
+      permission: hideandseek.end
+      permission-message: You don't have permission to stop the game.
+  pause:
+      description: pause the game
+      usage: /pause
+      permission: hideandseek.pause
+      permission-message: You don't have permission to pause the game.
+  hiderspawn:
+      description: set the spawn point for the hider
+      usage: /hider
+      permission: hideandseek.sethidder
+      permission-message: You don't have permission to set the hider spawn point.
+  seekerspawn:
+      description: set the spawn point for the seeker
+      usage: /seeker
+      permission: hideandseek.setseeker
+      permission-message: You don't have permission to set the seeker spawn point.
+  spawn:
+      description: set the spawn point for the game
+      usage: /spawn
+      permission: hideandseek.setspawn
+      permission-message: You don't have permission to set the spawn point.
+  show:
+      description: show the game
+      usage: /show
+      permission: hideandseek.show
+      permission-message: You don't have permission to show the game.
+  
+
+permissions:
+  hideandseek.start:
+    description: start the game
+    default: op
+  hideandseek.end:
+    description: stop the game
+    default: op
+  hideandseek.pause:
+    description: pause the game
+    default: op
+  hideandseek.sethidder:
+    description: set the spawn point for the hider
+    default: op
+  hideandseek.setseeker:
+    description: set the spawn point for the seeker
+    default: op
+  hideandseek.setspawn:
+    description: set the spawn point for the game
+    default: op
+  hideandseek.show:
+    description: show the game
+    default: op
