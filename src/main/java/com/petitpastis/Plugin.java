@@ -199,6 +199,10 @@ public class Plugin extends JavaPlugin
       hiders.remove(player);
     }
     player.setPlayerListName(ChatColor.LIGHT_PURPLE +"[SEEKER] " + player.getName());
+    if (state == States.PLAYING)
+    {
+      givePiglinHeadToPlayer(player);
+    }
     invisibleNameTeam.addEntry(player.getName());
     seekers.add(player);
   }

@@ -50,11 +50,14 @@ public class CommandsHandler implements CommandExecutor {
                 Bukkit.broadcastMessage("§cAucun seeker défini !");
                 return true;
             }
-            
-            for (Player player : plugin.getPlayers())
+            if (plugin.isRandomize() == true)
             {
-                player.getInventory().clear();
+                for (Player player : plugin.getPlayers())
+                {
+                    player.getInventory().clear();
+                }
             }
+            
             //lancement random
             if (plugin.isRandomize())
             {

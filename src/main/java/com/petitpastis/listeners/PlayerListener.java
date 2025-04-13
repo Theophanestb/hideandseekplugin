@@ -61,8 +61,10 @@ public class PlayerListener implements Listener
         player.setPlayerListName(ChatColor.WHITE + player.getName());
 
         ItemStack compass = new ItemStack(Material.CLOCK);
-        player.getInventory().setItem(4,compass);
-
+        if (!plugin.isRandomize())
+        {
+            player.getInventory().setItem(4,compass);
+        }
         player.sendMessage(ChatColor.YELLOW + "Clique sur la boussole pour choisir ton camp !");
     }
 
