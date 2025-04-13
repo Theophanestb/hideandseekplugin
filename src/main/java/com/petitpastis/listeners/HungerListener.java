@@ -10,9 +10,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.ItemStack;
 
 import com.petitpastis.Plugin;
 
@@ -77,9 +80,37 @@ public class HungerListener implements Listener {
         Block clickedBlock = event.getClickedBlock();
         if (clickedBlock == null) return;
 
-        // Si le bloc cliqué est dans la liste des blocs interdits, on annule l'interaction
         if (BLOCKED_BLOCKS.contains(clickedBlock.getType())) {
             event.setCancelled(true);
         }
+    }
+
+        @EventHandler
+    public void onArmorClick(InventoryClickEvent event) {
+        if (!(event.getWhoClicked() instanceof Player)) return;
+
+        // Interdit de retirer l'armure
+        if (event.getSlotType() == InventoryType.SlotType.ARMOR) {
+            event.setCancelled(true);
+        }
+
+        // Empêche les clics sur l'armure avec shift-click ou drag
+        ItemStack currentItem = event.getCurrentItem();
+        if (currentItem != null && isArmor(currentItem.getType())) {
+            if (event.getClick().isShiftClick()) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onItemDrop(PlayerDropItemEvent event) {
+        // Annule le drop d'item
+        event.setCancelled(true);
+    }
+
+    private boolean isArmor(Material material) {
+        String name = material.name().toLowerCase();
+        return name.contains("Head") || name.contains("helmet") || name.contains("head") || name.contains("boots");
     }
 }

@@ -19,6 +19,7 @@ import org.bukkit.scoreboard.Team;
 
 import com.petitpastis.commands.CommandsHandler;
 import com.petitpastis.enums.States;
+import com.petitpastis.items.GrapplePlugin;
 import com.petitpastis.listeners.BlockListener;
 import com.petitpastis.listeners.DamageListener;
 import com.petitpastis.listeners.DeathListener;
@@ -40,6 +41,8 @@ public class Plugin extends JavaPlugin
   private Scoreboard scoreboard;
 
   public boolean isGamePaused = false;
+
+  public boolean canBuild = false;
 
   public boolean seekerWaiting = false;
 
@@ -74,6 +77,7 @@ public class Plugin extends JavaPlugin
     pm.registerEvents(new PlayerListener(this), this);
     pm.registerEvents(new HungerListener(this), this);
     pm.registerEvents(new DeathListener(this), this);
+    pm.registerEvents(new GrapplePlugin(this), this);
 
     getCommand("start").setExecutor(new CommandsHandler(this));
     getCommand("pause").setExecutor(new CommandsHandler(this));
@@ -84,6 +88,7 @@ public class Plugin extends JavaPlugin
     getCommand("show").setExecutor(new CommandsHandler(this));
     getCommand("random").setExecutor(new CommandsHandler(this));
     getCommand("resume").setExecutor(new CommandsHandler(this));
+    getCommand("build").setExecutor(new CommandsHandler(this));
 
     resetGame();
   }
@@ -205,6 +210,10 @@ public class Plugin extends JavaPlugin
     }
     invisibleNameTeam.addEntry(player.getName());
     seekers.add(player);
+    if (state == States.PLAYING)
+    {
+      player.getInventory().addItem(GrapplePlugin.getGrappleItem());
+    } 
   }
 
   public void addHider(Player player)

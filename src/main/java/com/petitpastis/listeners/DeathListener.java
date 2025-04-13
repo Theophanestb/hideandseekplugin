@@ -38,11 +38,12 @@ public class DeathListener implements org.bukkit.event.Listener {
         }
         
         victim.spigot().respawn();
-        victim.setHealth(20);
-        victim.setGameMode(org.bukkit.GameMode.SURVIVAL);
         victim.teleport(plugin.getSeekerSpawn());
+        //victim.setHealth(20);
+        //victim.setGameMode(org.bukkit.GameMode.SURVIVAL);
         plugin.isGameOver();
-    
+        event.setDeathMessage(null);
+        event.getDrops().clear();
     }
 
     public void MoveToSeeker(Player player)

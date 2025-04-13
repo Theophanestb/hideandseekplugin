@@ -121,7 +121,7 @@ public class CommandsHandler implements CommandExecutor {
             }
             plugin.isGamePaused = false;
             return true;
-    }
+        }
         if (command.getName().equalsIgnoreCase("end"))
         {
             if (plugin.getState() == States.PLAYING)
@@ -221,6 +221,20 @@ public class CommandsHandler implements CommandExecutor {
                 {
                     plugin.getSeekers().remove(player);
                 }
+            }
+            return true;
+        }
+        if (command.getName().equalsIgnoreCase("build"))
+        {
+            if (plugin.canBuild == true)
+            {
+                plugin.canBuild = false;
+                Bukkit.broadcastMessage("§cConstruction désactivée !");
+            }
+            else
+            {
+                plugin.canBuild = true;
+                Bukkit.broadcastMessage("§aConstruction activée !");
             }
             return true;
         }

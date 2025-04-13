@@ -12,6 +12,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import com.petitpastis.Plugin;
 import com.petitpastis.enums.States;
@@ -30,6 +32,8 @@ public class PlayerListener implements Listener
     {
         Player player = event.getPlayer();
 
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999999999, 1, false, false));
+
         World world = player.getWorld();
         world.setGameRule(GameRule.KEEP_INVENTORY, true);
         
@@ -40,8 +44,8 @@ public class PlayerListener implements Listener
             {
                 plugin.spawn = new org.bukkit.Location(Bukkit.getServer().getWorld("world"), -60, -60, -60);
             }
-            player.teleport(plugin.spawn);
         }
+        player.teleport(plugin.spawn);
         plugin.addPlayers(player);
         player.getInventory().clear();
         if (plugin.getState() == States.PLAYING)

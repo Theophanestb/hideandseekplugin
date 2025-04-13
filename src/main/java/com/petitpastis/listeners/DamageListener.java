@@ -9,6 +9,7 @@ import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.meta.FireworkMeta;
 
 import com.petitpastis.Plugin;
@@ -59,24 +60,32 @@ public class DamageListener  implements org.bukkit.event.Listener{
         }
     }
 
+    @EventHandler
+    public void onFallDamage(EntityDamageEvent event) {
+        Player player = (Player) event.getEntity();
+        if (event.getEntity() instanceof Player && event.getCause() == EntityDamageEvent.DamageCause.FALL && plugin.isSeeker(player)) {
+            event.setCancelled(true);
+        }
+    }
+
     public void MoveToSeeker(Player player)
     {
         plugin.addSeeker(player);
     }
 
     public void launchFirework(Player victim) 
-  {
-      Firework firework = (Firework) victim.getWorld().spawnEntity(victim.getLocation(), EntityType.FIREWORK_ROCKET);
-      FireworkMeta meta = firework.getFireworkMeta();
+    {
+        Firework firework = (Firework) victim.getWorld().spawnEntity(victim.getLocation(), EntityType.FIREWORK_ROCKET);
+        FireworkMeta meta = firework.getFireworkMeta();
 
-      FireworkEffect effect = FireworkEffect.builder()
-              .withColor(Color.RED)
-              .withFade(Color.BLUE)
-              .with(FireworkEffect.Type.BURST)
-              .build();
-      
-      meta.addEffect(effect);
-      meta.setPower(1);  // L'intensité du feu d'artifice (1 à 3)
-      firework.setFireworkMeta(meta);
-  }
+        FireworkEffect effect = FireworkEffect.builder()
+                .withColor(Color.RED)
+                .withFade(Color.BLUE)
+                .with(FireworkEffect.Type.BURST)
+                .build();
+        
+        meta.addEffect(effect);
+        meta.setPower(1);  // L'intensité du feu d'artifice (1 à 3)
+        firework.setFireworkMeta(meta);
+    }
 }

@@ -9,6 +9,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.petitpastis.enums.States;
+import com.petitpastis.items.GrapplePlugin;
 
 public class GameLauncher extends BukkitRunnable {
 
@@ -50,7 +51,9 @@ public class GameLauncher extends BukkitRunnable {
     {
         for (Player player : plugin.getSeekers())
         {
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999999999, 1, false, false));
             player.getInventory().clear();
+            player.getInventory().addItem(GrapplePlugin.getGrappleItem());
             player.teleport(plugin.getSeekerSpawn());
             player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 600, 9, false, false));
             plugin.seekerWaiting = true;
@@ -68,6 +71,7 @@ public class GameLauncher extends BukkitRunnable {
         }
         for (Player player : plugin.getHiders())
         {
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999999999, 1, false, false));
             player.getInventory().clear();
             player.setInvulnerable(false);
             player.teleport(plugin.getHiderSpawn());

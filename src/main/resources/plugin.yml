@@ -47,6 +47,11 @@ commands:
       usage: /resume
       permission: hideandseek.resume
       permission-message: You don't have permission to resume the game.
+  build:
+      description: build in the game
+      usage: /build
+      permission: hideandseek.build
+      permission-message: You don't have permission to build in the game.
   
 
 permissions:
@@ -76,4 +81,7 @@ permissions:
     default: op
   hideandseek.resume:
     description: resume the game
+    default: op
+  hideandseek.build:
+    description: build in the game
     default: op
