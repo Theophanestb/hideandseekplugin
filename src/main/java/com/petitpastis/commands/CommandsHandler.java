@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.petitpastis.Plugin;
 import com.petitpastis.enums.States;
+import com.petitpastis.events.AirdropManager;
 
 public class CommandsHandler implements CommandExecutor {
     private Plugin plugin;    
@@ -33,11 +34,11 @@ public class CommandsHandler implements CommandExecutor {
                 return true;
             }
             int nbPlayers = plugin.getPlayers().size();
-            if (nbPlayers < 2)
+            /*if (nbPlayers < 2)
             {
                 sender.sendMessage("§cPas assez de joueurs jouer ! (pas d'amis?)");
                 return true;
-            }
+            }*/
             
             if (plugin.getState() != States.WAITING)
             {
@@ -45,11 +46,11 @@ public class CommandsHandler implements CommandExecutor {
                 return true;
             }
 
-            if (plugin.getSeekers().isEmpty() && plugin.isRandomize() == false)
+            /*if (plugin.getSeekers().isEmpty() && plugin.isRandomize() == false)
             {
                 Bukkit.broadcastMessage("§cAucun seeker défini !");
                 return true;
-            }
+            }*/
             if (plugin.isRandomize() == true)
             {
                 for (Player player : plugin.getPlayers())
@@ -236,6 +237,11 @@ public class CommandsHandler implements CommandExecutor {
                 plugin.canBuild = true;
                 Bukkit.broadcastMessage("§aConstruction activée !");
             }
+            return true;
+        }
+        if (command.getName().equalsIgnoreCase("loadouts"))
+        {
+            plugin.coordinates.showCoordinates((Player)sender);
             return true;
         }
         return false;

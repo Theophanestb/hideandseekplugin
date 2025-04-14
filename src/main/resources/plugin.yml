@@ -52,7 +52,11 @@ commands:
       usage: /build
       permission: hideandseek.build
       permission-message: You don't have permission to build in the game.
-  
+  loadouts:
+      description: loadouts
+      usage: /loadouts
+      permission: hideandseek.loadouts
+      permission-message: You don't have permission to loadouts.
 
 permissions:
   hideandseek.start:
@@ -84,4 +88,7 @@ permissions:
     default: op
   hideandseek.build:
     description: build in the game
+    default: op
+  hideandseek.loadouts:
+    description: loadouts
     default: op

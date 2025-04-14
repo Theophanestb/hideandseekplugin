@@ -16,9 +16,11 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
+import org.checkerframework.checker.units.qual.g;
 
 import com.petitpastis.commands.CommandsHandler;
 import com.petitpastis.enums.States;
+import com.petitpastis.events.AirdropManager;
 import com.petitpastis.items.GrapplePlugin;
 import com.petitpastis.listeners.BlockListener;
 import com.petitpastis.listeners.DamageListener;
@@ -57,6 +59,9 @@ public class Plugin extends JavaPlugin
   private Location hiderSpawn;
   public Location spawn;
 
+  public Coordinates coordinates;
+  private AirdropManager airdropManager;
+
   @Override
   public void onEnable()
   {
@@ -69,6 +74,9 @@ public class Plugin extends JavaPlugin
         invisibleNameTeam = scoreboard.registerNewTeam("invisibleNameTeam");
     }
     invisibleNameTeam.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
+
+    coordinates = new Coordinates(this);
+    airdropManager = new AirdropManager(this);
 
     PluginManager pm = getServer().getPluginManager();
     pm.registerEvents(new TeamSelectorListener(this), this);
@@ -89,6 +97,9 @@ public class Plugin extends JavaPlugin
     getCommand("random").setExecutor(new CommandsHandler(this));
     getCommand("resume").setExecutor(new CommandsHandler(this));
     getCommand("build").setExecutor(new CommandsHandler(this));
+    getCommand("loadouts").setExecutor(new CommandsHandler(this));
+
+    startAirdropScheduler();
 
     resetGame();
   }
@@ -156,7 +167,6 @@ public class Plugin extends JavaPlugin
     return hiderSpawn;
   }
 
-
   public void setSpawn(Location location)
   {
     this.spawn = location;
@@ -175,7 +185,6 @@ public class Plugin extends JavaPlugin
   {
     return seekers.contains(player);
   }
-
 
   //////////////////// ADD HIDDER AND SEEKERS //////////////////////
   public void addPlayers(Player player)
@@ -308,5 +317,19 @@ public class Plugin extends JavaPlugin
   {
     player.getInventory().setHelmet(new ItemStack(Material.AIR));
   }
+
+
+  public void startAirdropScheduler() {
+    Bukkit.getScheduler().runTaskTimer(this, () -> {
+        if (state == States.PLAYING) 
+        {
+            int i = (int) (Math.random() * coordinates.getCoordinates().size());
+            String message = coordinates.getCoordinatesName().get(i);
+            Bukkit.broadcastMessage(ChatColor.GOLD + "Un loadout arrive " + ChatColor.GREEN + message +" !");
+            Bukkit.broadcastMessage(ChatColor.GRAY + "Il disparaitra dans deux minutes...");
+            airdropManager.spawnAirdrop(coordinates.getCoordinates().get(i));
+        }
+    }, 0L, 2400L); // 2400 ticks = 2 minutes
+}
 
 }
