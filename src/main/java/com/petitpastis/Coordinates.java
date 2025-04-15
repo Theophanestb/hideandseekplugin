@@ -5,55 +5,60 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Coordinates {
     private Plugin plugin;
 
-    private List<Location> coordinates = new ArrayList<>();
-    private List<String> coordinates_name = new ArrayList<>();
+    private Map<Location, String> coordinates_map = new HashMap<>();
 
-    public Coordinates(Plugin plugin) {
+    public Coordinates(Plugin plugin) 
+    {
         this.plugin = plugin;
-        coordinates.add(new Location(Bukkit.getServer().getWorld("world"), 205, 99, 494));
-        coordinates_name.add("sur le bureau");
-        coordinates.add(new Location(Bukkit.getServer().getWorld("world"), 378, 99, 317));
-        coordinates_name.add("sur le lit");
-        coordinates.add(new Location(Bukkit.getServer().getWorld("world"), 272, 99, 335));
-        coordinates_name.add("sur les rails");
-        coordinates.add(new Location(Bukkit.getServer().getWorld("world"), 271, 99, 240));
-        coordinates_name.add("à côté de la guitare");
-        coordinates.add(new Location(Bukkit.getServer().getWorld("world"),167 , 99, 321));
-        coordinates_name.add("sur le skate");
-        coordinates.add(new Location(Bukkit.getServer().getWorld("world"),107 , 99, 435));
-        coordinates_name.add("sur l'arbre");
-        coordinates.add(new Location(Bukkit.getServer().getWorld("world"),107 , 99, 491));
-        coordinates_name.add("dans la poubelle");
-        coordinates.add(new Location(Bukkit.getServer().getWorld("world"),253 , 99, 384));
-        coordinates_name.add("sur l'avion");
-        coordinates.add(new Location(Bukkit.getServer().getWorld("world"),93 , 99, 334));
-        coordinates_name.add("sur le globe");
-        coordinates.add(new Location(Bukkit.getServer().getWorld("world"),379 , 99, 498));
-        coordinates_name.add("sur la télé");
-        coordinates.add(new Location(Bukkit.getServer().getWorld("world"),257 , 99, 316));
-        coordinates_name.add("sur le tapis");
+        coordinates_map.put(new Location(Bukkit.getServer().getWorld("world"), 205, -13, 494), "sur le bureau");
+        coordinates_map.put(new Location(Bukkit.getServer().getWorld("world"), 378, -31, 317), "sur le lit");
+        coordinates_map.put(new Location(Bukkit.getServer().getWorld("world"), 272, -16, 335), "sur les rails");
+        coordinates_map.put(new Location(Bukkit.getServer().getWorld("world"), 270, 10, 236), "sur piggy bank");
+        coordinates_map.put(new Location(Bukkit.getServer().getWorld("world"), 167, -55, 321), "sur le skate");
+        coordinates_map.put(new Location(Bukkit.getServer().getWorld("world"), 107, 20, 435), "sur l'arbre");
+        coordinates_map.put(new Location(Bukkit.getServer().getWorld("world"), 103, -42, 498), "dans la poubelle");
+        coordinates_map.put(new Location(Bukkit.getServer().getWorld("world"), 253, 88, 384), "sur l'avion");
+        coordinates_map.put(new Location(Bukkit.getServer().getWorld("world"), 93, 61, 334), "sur le globe");
+        coordinates_map.put(new Location(Bukkit.getServer().getWorld("world"), 379, -23, 498), "sur la télé");
+        coordinates_map.put(new Location(Bukkit.getServer().getWorld("world"), 257, -59, 316), "sur le tapis");
     }
     
-    public List<String> getCoordinatesName() 
+    public Location getLocationAtIndex(int index) 
     {
-        return coordinates_name;
+        return new ArrayList<>(coordinates_map.keySet()).get(index);
+    }
+    
+    public String getNameAtIndex(int index) 
+    {
+        return new ArrayList<>(coordinates_map.values()).get(index);
     }
 
-    public List<Location> getCoordinates() 
+    public List<Map.Entry<Location, String>> getShuffledEntries() 
     {
-        return coordinates;
+        List<Map.Entry<Location, String>> entries = new ArrayList<>(coordinates_map.entrySet());
+        Collections.shuffle(entries);
+        return entries;
+    }
+
+    public int size() 
+    {
+        return coordinates_map.size();
     }
 
     public void showCoordinates(Player player) 
     {
-        for (Location loc : coordinates)
-        {
-            player.sendMessage("Coordinates: " + loc.getX() + ", " + loc.getY() + ", " + loc.getZ());
+        for (Map.Entry<Location, String> entry : coordinates_map.entrySet()) {
+            Location location = entry.getKey();
+            String name = entry.getValue();
+            player.sendMessage("Coordonnées de " + name + ": " + location.getBlockX() + ", " + location.getBlockY() + ", " + location.getBlockZ());
         }
     }
 }

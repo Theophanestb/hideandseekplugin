@@ -3,6 +3,8 @@ package com.petitpastis.listeners;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
+import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
@@ -23,6 +25,50 @@ public class DamageListener  implements org.bukkit.event.Listener{
 
     public DamageListener(Plugin plugin) {
         this.plugin = plugin;
+    }
+
+    @EventHandler
+    public void onFallDamage(EntityDamageEvent event) {
+        if (event.getEntity() == null) return;
+        if (event.getEntity().getType() != EntityType.PLAYER) return;
+        Player player = (Player) event.getEntity();
+        if (event.getEntity() instanceof Player && event.getCause() == EntityDamageEvent.DamageCause.FALL && player.getInventory().getBoots() != null) 
+        {
+            event.setCancelled(true);
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                player.getInventory().setBoots(null);
+            }, 1L);
+            
+            player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.5f, 1);
+            player.sendMessage(org.bukkit.ChatColor.RED + "Vos bottes ont amortis votre chute mais ont disparues par la même occasion !");
+        }
+        else if (event.getEntity() instanceof Player && event.getCause() == EntityDamageEvent.DamageCause.FALL && plugin.isHider(player))
+        {
+            event.setCancelled(true);
+            double damages = event.getDamage();
+            if (damages / 2.5 > player.getHealth())
+            {
+                player.setHealth(0);
+            } 
+            else 
+            {
+                player.setHealth(player.getHealth() - (damages / 2.5));
+                player.damage(0.01);
+            }
+        }
+        else if (event.getEntity() instanceof Player && event.getCause() == EntityDamageEvent.DamageCause.FALL && plugin.isSeeker(player)) {
+            event.setCancelled(true);
+            double damages = event.getDamage();
+            if (damages / 3 > player.getHealth())
+            {
+                player.setHealth(0);
+            } 
+            else 
+            {
+                player.setHealth(player.getHealth() - (damages / 3));
+                player.damage(0.01);
+            }
+        }
     }
 
     @SuppressWarnings("deprecation")
@@ -60,13 +106,7 @@ public class DamageListener  implements org.bukkit.event.Listener{
         }
     }
 
-    @EventHandler
-    public void onFallDamage(EntityDamageEvent event) {
-        Player player = (Player) event.getEntity();
-        if (event.getEntity() instanceof Player && event.getCause() == EntityDamageEvent.DamageCause.FALL && plugin.isSeeker(player)) {
-            event.setCancelled(true);
-        }
-    }
+    
 
     public void MoveToSeeker(Player player)
     {

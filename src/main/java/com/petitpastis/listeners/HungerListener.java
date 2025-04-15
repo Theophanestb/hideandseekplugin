@@ -3,6 +3,8 @@ package com.petitpastis.listeners;
 import java.util.EnumSet;
 import java.util.Set;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -16,6 +18,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.units.qual.C;
 
 import com.petitpastis.Plugin;
 
@@ -79,6 +82,10 @@ public class HungerListener implements Listener {
 
         Block clickedBlock = event.getClickedBlock();
         if (clickedBlock == null) return;
+        if (clickedBlock.getType() == Material.CHEST)
+        {
+            Bukkit.broadcastMessage(ChatColor.GREEN + event.getPlayer().getName()+" a ouvert le loadout !");
+        }
 
         if (BLOCKED_BLOCKS.contains(clickedBlock.getType())) {
             event.setCancelled(true);
@@ -90,14 +97,15 @@ public class HungerListener implements Listener {
         if (!(event.getWhoClicked() instanceof Player)) return;
 
         // Interdit de retirer l'armure
-        if (event.getSlotType() == InventoryType.SlotType.ARMOR) {
-            event.setCancelled(true);
-        }
+        /*if (event.getSlotType() == InventoryType.SlotType.ARMOR) {
+            event.getWhoClicked().getInventory().setBoots(event.getCurrentItem());
+            return;
+        }*/
 
         // Empêche les clics sur l'armure avec shift-click ou drag
         ItemStack currentItem = event.getCurrentItem();
         if (currentItem != null && isArmor(currentItem.getType())) {
-            if (event.getClick().isShiftClick()) {
+            if (event.getClick().isShiftClick() || event.getClick().isRightClick() || event.getClick().isLeftClick()) {
                 event.setCancelled(true);
             }
         }
@@ -111,6 +119,6 @@ public class HungerListener implements Listener {
 
     private boolean isArmor(Material material) {
         String name = material.name().toLowerCase();
-        return name.contains("Head") || name.contains("helmet") || name.contains("head") || name.contains("boots");
+        return name.contains("Head") || name.contains("helmet") || name.contains("head");
     }
 }

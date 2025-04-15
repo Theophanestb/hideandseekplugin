@@ -1,7 +1,9 @@
 package com.petitpastis;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
@@ -21,7 +23,7 @@ import org.checkerframework.checker.units.qual.g;
 import com.petitpastis.commands.CommandsHandler;
 import com.petitpastis.enums.States;
 import com.petitpastis.events.AirdropManager;
-import com.petitpastis.items.GrapplePlugin;
+import com.petitpastis.items.ItemsListener;
 import com.petitpastis.listeners.BlockListener;
 import com.petitpastis.listeners.DamageListener;
 import com.petitpastis.listeners.DeathListener;
@@ -85,7 +87,7 @@ public class Plugin extends JavaPlugin
     pm.registerEvents(new PlayerListener(this), this);
     pm.registerEvents(new HungerListener(this), this);
     pm.registerEvents(new DeathListener(this), this);
-    pm.registerEvents(new GrapplePlugin(this), this);
+    pm.registerEvents(new ItemsListener(this), this);
 
     getCommand("start").setExecutor(new CommandsHandler(this));
     getCommand("pause").setExecutor(new CommandsHandler(this));
@@ -98,6 +100,7 @@ public class Plugin extends JavaPlugin
     getCommand("resume").setExecutor(new CommandsHandler(this));
     getCommand("build").setExecutor(new CommandsHandler(this));
     getCommand("loadouts").setExecutor(new CommandsHandler(this));
+    getCommand("giveitems").setExecutor(new CommandsHandler(this));
 
     startAirdropScheduler();
 
@@ -221,7 +224,7 @@ public class Plugin extends JavaPlugin
     seekers.add(player);
     if (state == States.PLAYING)
     {
-      player.getInventory().addItem(GrapplePlugin.getGrappleItem());
+      player.getInventory().addItem(ItemsListener.getGrappleItem());
     } 
   }
 
@@ -318,18 +321,23 @@ public class Plugin extends JavaPlugin
     player.getInventory().setHelmet(new ItemStack(Material.AIR));
   }
 
+  public void startAirdropScheduler() 
+  {
+      Bukkit.getScheduler().runTaskTimer(this, () -> 
+      {
+          if (state == States.PLAYING) 
+          {
+              List<Map.Entry<Location, String>> shuffled = coordinates.getShuffledEntries();
+              Map.Entry<Location, String> entry = shuffled.get(0);
 
-  public void startAirdropScheduler() {
-    Bukkit.getScheduler().runTaskTimer(this, () -> {
-        if (state == States.PLAYING) 
-        {
-            int i = (int) (Math.random() * coordinates.getCoordinates().size());
-            String message = coordinates.getCoordinatesName().get(i);
-            Bukkit.broadcastMessage(ChatColor.GOLD + "Un loadout arrive " + ChatColor.GREEN + message +" !");
-            Bukkit.broadcastMessage(ChatColor.GRAY + "Il disparaitra dans deux minutes...");
-            airdropManager.spawnAirdrop(coordinates.getCoordinates().get(i));
-        }
-    }, 0L, 2400L); // 2400 ticks = 2 minutes
-}
+              String message = entry.getValue();
+              Location location = entry.getKey();
+
+              Bukkit.broadcastMessage(ChatColor.GOLD + "Un loadout arrive " + ChatColor.GREEN + message + " !");
+              Bukkit.broadcastMessage(ChatColor.GRAY + "Il disparaitra dans deux minutes...");
+              airdropManager.spawnAirdrop(location);
+          }
+      }, 20*120, 20 * 120);
+  }
 
 }

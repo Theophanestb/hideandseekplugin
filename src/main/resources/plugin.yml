@@ -57,6 +57,11 @@ commands:
       usage: /loadouts
       permission: hideandseek.loadouts
       permission-message: You don't have permission to loadouts.
+  giveitems:
+      description: give an item to a player
+      usage: /giveitems <player> <item>
+      permission: hideandseek.giveitems
+      permission-message: You don't have permission to give items.
 
 permissions:
   hideandseek.start:
@@ -91,4 +96,7 @@ permissions:
     default: op
   hideandseek.loadouts:
     description: loadouts
+    default: op
+  hideandseek.giveitems:
+    description: give an item to a player
     default: op

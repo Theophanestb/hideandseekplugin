@@ -1,6 +1,8 @@
 package com.petitpastis.listeners;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -18,15 +20,22 @@ public class DeathListener implements org.bukkit.event.Listener {
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player victim = event.getEntity();
-        Player killer = event.getEntity().getKiller();
+        Player killer = null;
+        if (victim.getKiller() != null)
+            killer = event.getEntity().getKiller();
 
         if (plugin.isHider(victim))
         {
             if (victim.getLastDamageCause().getCause() == DamageCause.FALL)
             {
-                Bukkit.broadcastMessage(victim.getName() + ": J'ai glissé chef");
+                Bukkit.broadcastMessage(ChatColor.AQUA + victim.getName() + ChatColor.GOLD +": J'ai glissé chef");
             }
-            MoveToSeeker(victim);
+            if (plugin.isHider(victim))
+            {
+                MoveToSeeker(victim);
+                Bukkit.broadcastMessage(ChatColor.AQUA +victim.getName() +ChatColor.DARK_RED+ " devient seeker !");
+            }
+                
         }
         if (killer != null && plugin.isSeeker(killer)) 
         {
@@ -37,13 +46,17 @@ public class DeathListener implements org.bukkit.event.Listener {
             Bukkit.broadcastMessage(victim.getName() + " s'est fait bousiller par " + killer.getName() + " bahaha dans l'crâne à ta mère");
         }
         
-        victim.spigot().respawn();
-        victim.teleport(plugin.getSeekerSpawn());
-        //victim.setHealth(20);
-        //victim.setGameMode(org.bukkit.GameMode.SURVIVAL);
-        plugin.isGameOver();
         event.setDeathMessage(null);
         event.getDrops().clear();
+
+        // Délai de 1 tick avant de ressusciter proprement
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            victim.spigot().respawn();
+            victim.teleport(plugin.getSeekerSpawn());
+            victim.setHealth(20);
+            victim.setGameMode(GameMode.SURVIVAL);
+            plugin.isGameOver();
+        }, 1L);
     }
 
     public void MoveToSeeker(Player player)

@@ -244,6 +244,15 @@ public class CommandsHandler implements CommandExecutor {
             plugin.coordinates.showCoordinates((Player)sender);
             return true;
         }
+        if (command.getName().equalsIgnoreCase("giveitems"))
+        {
+            AirdropManager airdropManager = new AirdropManager(plugin);
+            ((Player)sender).getInventory().addItem(airdropManager.createBoots());
+            ((Player)sender).getInventory().addItem(airdropManager.createLimitedPunchBow());
+            ((Player)sender).getInventory().addItem(airdropManager.createTeleportSwapRod());
+            ((Player)sender).getInventory().addItem(airdropManager.createGhostPearl());
+            ((Player)sender).getInventory().addItem(airdropManager.createSplashInvisibilityPotion());
+        }
         return false;
     }
 }

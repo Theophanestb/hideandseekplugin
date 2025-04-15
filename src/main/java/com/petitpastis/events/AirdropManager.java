@@ -1,6 +1,8 @@
 package com.petitpastis.events;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -13,6 +15,7 @@ import org.bukkit.World;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -25,6 +28,8 @@ import com.petitpastis.enums.States;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.potion.PotionData;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
 public class AirdropManager {
@@ -37,6 +42,9 @@ public class AirdropManager {
         this.plugin = plugin;
         items.add(createLimitedPunchBow());
         items.add(createSplashInvisibilityPotion());
+        items.add(createTeleportSwapRod());
+        items.add(createGhostPearl());
+        items.add(createBoots());
     }
 
     public ItemStack createLimitedPunchBow() 
@@ -53,13 +61,57 @@ public class AirdropManager {
         return bow;
     }
 
+    public ItemStack createGhostPearl() 
+    {
+        ItemStack pearl = new ItemStack(Material.ENDER_PEARL);
+        ItemMeta meta = pearl.getItemMeta();
+        meta.setDisplayName(ChatColor.DARK_PURPLE + "Perle");
+        meta.setLore(Collections.singletonList(ChatColor.GRAY + "Téléportation silencieuse"));
+        pearl.setItemMeta(meta);
+        return pearl;
+    }
+
+    public ItemStack createBoots()
+    {
+        ItemStack boots = new ItemStack(Material.LEATHER_BOOTS);
+        ItemMeta meta = boots.getItemMeta();
+        meta.setDisplayName(ChatColor.AQUA + "No Fall Damage Boots");
+        meta.addEnchant(Enchantment.FEATHER_FALLING, 9, true);
+        boots.setDurability((short) (boots.getType().getMaxDurability() - 2));
+        boots.setItemMeta(meta);
+        return boots;
+    }
+
+    public ItemStack createTeleportSwapRod() 
+    {
+        ItemStack rod = new ItemStack(Material.BLAZE_ROD);
+        ItemMeta meta = rod.getItemMeta();
+
+        meta.setDisplayName(ChatColor.LIGHT_PURPLE + "Bâton de Transposition");
+        meta.addEnchant(Enchantment.KNOCKBACK, 1, true);
+        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        meta.setLore(Arrays.asList(
+            ChatColor.GRAY + "Frappez un joueur pour échanger vos places",
+            ChatColor.DARK_GRAY + "(usage unique)"
+        ));
+
+        rod.setItemMeta(meta);
+        return rod;
+    }
+
     public ItemStack createSplashInvisibilityPotion() 
     {
-        ItemStack potion = new ItemStack(Material.SPLASH_POTION);
+         ItemStack potion = new ItemStack(Material.SPLASH_POTION);
         PotionMeta meta = (PotionMeta) potion.getItemMeta();
-        meta.setDisplayName(ChatColor.GRAY + "Potion de Disparition Rapide");
-        meta.setBasePotionData(new PotionData(PotionType.INVISIBILITY, false, false));
+
+        meta.setDisplayName(ChatColor.AQUA + "Potion d'invisibilité (20s)");
         meta.setColor(Color.GRAY);
+
+        // Ajoute un effet de 30 secondes (30 x 20 ticks)
+        PotionEffect effect = new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 20, 0, true, true);
+        meta.addCustomEffect(effect, true);
+
         potion.setItemMeta(meta);
         return potion;
     }
